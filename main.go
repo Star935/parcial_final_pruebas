@@ -53,7 +53,7 @@ func main() {
 
 	// Rutas para la gestion de movimientos
 	e.GET("/movements", h.GetMovements)
-	e.GET("/register-movement", h.RegisterMovement)
+	e.POST("/register-movement", h.RegisterMovement)
 	e.DELETE("/exit-movement/:id", h.ExitMovement)
 
 	e.Logger.Fatal(e.Start(":8080"))

@@ -146,6 +146,53 @@
             id="deleteMessage" 
             style="color:red;"
         ></p>
+        <hr>
+        <!-- Seccion para crear categorias -->
+        <!-- Titulo de crear categoria -->
+        <h1>
+            Crear Categoria
+        </h1>
+        <!-- Input de nombre -->
+        <input 
+            id="categoryName" 
+            placeholder="Nombre"
+        ><br>
+        <!-- Input de descripcion -->
+        <input 
+            id="categoryDescription" 
+            placeholder="Descripción"
+        ><br>
+        <!-- Boton para crear materia -->
+        <button
+            id="submitBtnCategory"
+            onclick="createCategory()"
+        >
+            Crear
+        </button>
+        <!-- Mensaje de exito -->
+        <p 
+            id="successMessageCategory" 
+            style="display:none; color:green;"
+        >
+            Categoria Creada correctamente
+        </p>
+        <hr>
+
+        <!-- Titulo de recuperar categoria por id -->
+        <h2>
+            Buscar Categoria por ID
+        </h2>
+        <!-- Input del id -->
+        <input 
+            id="searchById" 
+            placeholder="ID"
+        >
+        <!-- Boton para recuperar categoria por id -->
+        <button onclick="getCategoryById()">
+            Buscar
+        </button>
+        <pre id="searchResultCategory"></pre>
+        <hr>
 
         <script>
             // Ruta para las peticiones
@@ -153,14 +200,17 @@
 
             // Metodo para limpiar los campos del formulario
             function cleanMessages() {
-                document.getElementById("successMessage").style.display = "none";
-                document.getElementById("successMessage").innerText     = "";
-                document.getElementById("updateMessage").innerText      = "";
-                document.getElementById("deleteMessage").innerText      = "";
-                document.getElementById("searchResult").innerText       = "";
+                document.getElementById("successMessage").style.display   = "none";
+                document.getElementById("successMessage").innerText       = "";
+                document.getElementById("successMessageCategory").style.display   = "none";
+                document.getElementById("successMessageCategory").innerText       = "";
+                document.getElementById("updateMessage").innerText        = "";
+                document.getElementById("deleteMessage").innerText        = "";
+                document.getElementById("searchResult").innerText         = "";
+                document.getElementById("searchResultCategory").innerText = "";
             }
 
-            // Metodo para crear materia
+            // Metodo para crear producto
             function createProduct() {
                 // Limpia los campos del formulario
                 cleanMessages();
@@ -191,6 +241,36 @@
                         document.getElementById("subjectPrice").value    = 0;
                         document.getElementById("subjectStock").value    = 0;
                         document.getElementById("subjectCategory").value = 0;
+                    });
+            }
+
+            // Metodo para crear categoria
+            function createCategory() {
+                // Limpia los campos del formulario
+                cleanMessages();
+
+                // Setea los campos para la peticion
+                const data = {
+                    name        : document.getElementById("categoryName").value,
+                    description : document.getElementById("categoryDescription").value,
+                };
+
+                // Realiza fetch para la peticion para crear materia nueva
+                fetch(`${api}/categories`, {
+                    method  : "POST",
+                    headers : { "Content-Type": "application/json" },
+                    body    : JSON.stringify(data)
+                })
+                    .then(res => res.json())
+                    .then(() => {
+                        document.getElementById("successMessageCategory").style.display = "block";
+                        // Mensaje de exito
+                        document.getElementById("successMessageCategory").innerText     = "Categoria Creada correctamente";
+
+                        // Limpia los campos del formulario
+                        document.getElementById("subjectId").value          = "";
+                        document.getElementById("subjectName").value        = "";
+                        document.getElementById("subjectDescription").value = "";
                     });
             }
 
@@ -235,6 +315,24 @@
                     });
             }
 
+            // Metodo para recuperar materias por su id
+            function getCategoryById() {
+                // Limpia los campos del formulario
+                cleanMessages();
+
+                // Recupera el id
+                const id = document.getElementById("searchById").value;
+
+                // Realiza fetch para la peticion para recuperar una materia por su id
+                fetch(`${api}/categories/${id}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        // Muestra el json de la materia
+                        document.getElementById("searchResultCategory").innerText =
+                        JSON.stringify(data, null, 2);
+                    });
+            }
+
             // Metodo para actualizar producto
             function updateProduct() {
                 // Limpia los campos del formulario
@@ -269,7 +367,7 @@
             }
 
             // Metodo para eliminar materia
-            function deleteSubject() {
+            function deleteProduct() {
                 // Limpia los campos del formulario
                 cleanMessages();
 

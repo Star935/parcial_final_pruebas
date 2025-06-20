@@ -115,3 +115,90 @@ func TestPerformanceCreateCategory(t *testing.T) {
     }
     t.Logf("Se crearon %d categorias con éxito", count)
 }
+
+// Prueba de performance para la creacion de 50 movimientos
+func TestPerformanceCreateMovement(t *testing.T) {
+    rand.Seed(time.Now().UnixNano())
+
+    // Define time out
+    ctxSetup, cancelSetup := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancelSetup()
+
+	// Configuracion para conexion a base de datos
+    client, err := mongo.Connect(ctxSetup, options.Client().ApplyURI("mongodb://localhost:27017"))
+    if err != nil {
+        t.Fatal(err)
+    }
+
+	// Define la base de datos y la coleccion
+    userColl := client.Database("test_db_final2").Collection("movements")
+    if err := userColl.Drop(ctxSetup); err != nil {
+        t.Fatal(err)
+    }
+
+    // Levanta server en httptest
+    h := handlers.NewHandler(nil, userColl, nil)
+
+	// Instancia de echo
+    e := echo.New()
+
+	// Ruta para crear productos
+    e.POST("/register-movement", h.CreateCategory)
+    ts := httptest.NewServer(e)
+    defer ts.Close()
+
+	// Define la frecuencia de request de creacion
+    rate := vegeta.Rate{
+		Freq: 10, 
+		Per: time.Second,
+	}
+
+	// Define la duracion de la prueba
+    duration := 5 * time.Second
+
+	// Prepara peticiones
+    attacker := vegeta.NewAttacker()
+
+	// Instancia de las metricas de las pruebas
+    var metrics vegeta.Metrics
+
+	// Organiza peticiones
+    targeter := func() vegeta.Targeter {
+        return func(tgt *vegeta.Target) error {
+			// Instancia seteada de producto
+            u := models.Movement{
+                Stock: rand.Intn(3),
+            }
+			// Codifica 
+            body, _ := json.Marshal(u)
+			// Organiza la peticion
+            *tgt = vegeta.Target{
+                Method : "POST",
+                URL    : ts.URL + "/register-movement",
+                Body   : body,
+                Header : map[string][]string{"Content-Type": {"application/json"}},
+            }
+            return nil
+        }
+    }()
+
+	// Ejecuta pruebas
+    for res := range attacker.Attack(targeter, rate, duration, "perf-create-movements") {
+        metrics.Add(res)
+    }
+    metrics.Close()
+
+    // Crea un nuevo contexto para consulta (o usa context.Background())
+    ctxQuery, cancelQuery := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancelQuery()
+
+	// Cuenta los documentos alterados
+    count, err := userColl.CountDocuments(ctxQuery, bson.M{})
+    if err != nil {
+        t.Fatal(err)
+    }
+    if count == 0 {
+        t.Fatal("No se creó ninguna categoria en la base de datos")
+    }
+    t.Logf("Se crearon %d categorias con éxito", count)
+}

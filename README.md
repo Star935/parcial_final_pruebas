@@ -28,7 +28,7 @@ El proyecto corre en localhost
 - DELETE "/categories/:id" Elimina una categoria por su id
 
 ### Nota importante
-El comando del pipeline ejecuta todas las pruebas, incluida la de performance_test la cual falla, el siguiente es el fragmento de la informacion de la prueba
+El comando del pipeline ejecuta todas las pruebas, incluida la de performance_test la cual falla, el siguiente es el fragmento de la informacion de la prueba de performance
 ```bash
 FAIL	parcial_final/performance_test	5.005s
 ```
@@ -76,8 +76,6 @@ gosec ./...
 govulncheck ./...
 ```
 
-### Evidencia:
+### Evidencias de las pruebas de performance:
 ![Screenshot 2025-06-19 201620](https://github.com/user-attachments/assets/0680756e-dae3-4b75-8067-79a01bfce1ba)
 ![Screenshot 2025-06-19 201634](https://github.com/user-attachments/assets/cbd2b6fb-2ee5-40eb-9dec-ddf6df23987a)
-
-
