@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <!-- Titulo de la pestaña de la page -->
+        <title>
+            Gestión de productos
+        </title>
+        <style>
+            body { font-family: sans-serif; padding: 20px; }
+            input, button { margin: 5px; }
+            #subjectsList { margin-top: 20px; }
+        </style>
+    </head>
+    <body>
+        <!-- Seccion para crear materias -->
+        <!-- Titulo de crear materia -->
+        <h1>
+            Crear producto
+        </h1>
+        <!-- Input de nombre -->
+        <input 
+            id="subjectName" 
+            placeholder="Nombre"
+        ><br>
+        <!-- Input de precio -->
+        <input 
+            id="subjectPrice"   
+            placeholder="Precio"
+        ><br>
+        <!-- Input de stock -->
+        <input 
+            id="subjectStock"   
+            placeholder="Stock"
+        ><br>
+        <!-- Input de categoria -->
+        <input 
+            id="subjectCategory"
+            placeholder="Categoria"
+        ><br>
+        <!-- Boton para crear materia -->
+        <button
+            id="submitBtn"
+            onclick="createProduct()"
+        >
+            Crear
+        </button>
+        <!-- Mensaje de exito -->
+        <p 
+            id="successMessage" 
+            style="display:none; color:green;"
+        >
+            Creado correctamente
+        </p>
+        <hr>
+
+        <!-- Seccion de recuperar todas las materias -->
+        <!-- Titulo de recuperar todas las materias -->
+        <h2>
+            Todos los productos
+        </h2>
+        <!-- Boton para recuperar todas las materias -->
+        <button onclick="getProducts()">
+            Mostrar Todos
+        </button>
+        <ul id="subjectsList"></ul>
+        <hr>
+
+        <!-- Seccion de recuperar materia por id -->
+        <!-- Titulo de recuperar materia por id -->
+        <h2>
+            Buscar Producto por ID
+        </h2>
+        <!-- Input del id -->
+        <input 
+            id="searchById" 
+            placeholder="ID"
+        >
+        <!-- Boton para recuperar materia por id -->
+        <button onclick="getProductById()">
+            Buscar
+        </button>
+        <pre id="searchResult"></pre>
+
+        <hr>
+
+        <!-- Seccion para actualizar materia -->
+        <!-- Titulo de actualizar materia -->
+        <h2>
+            Actualizar producto
+        </h2>
+        <!-- Input del id de la materia a actualizar -->
+        <input 
+            id="updateId"
+            placeholder="ID de la materia a actualizar"
+        >
+        <br>
+        <!-- Input del nombre -->
+        <input 
+            id="updateName"
+            placeholder="Nuevo nombre"
+        >
+        <br>
+        <!-- Input del precio -->
+        <input 
+            id="updatePrice"
+            placeholder="Nueva precio"
+        >
+        <br>
+        <!-- Input de stock -->
+        <input 
+            id="updateStock"   
+            placeholder="Nuevo Stock"
+        ><br>
+        <!-- Input de categoria -->
+        <input 
+            id="updateCategory"
+            placeholder="Nueva categoria"
+        ><br>
+        <!-- Boton para actualizar producto -->
+        <button onclick="updateProduct()">
+            Actualizar
+        </button>
+        <p 
+            id="updateMessage"
+            style="color:green;"
+        ></p>
+        <hr>
+
+        <!-- Seccion de eliminar productos -->
+        <!-- Titulo de eliminar producto -->
+        <h2>
+            Eliminar producto por identificador
+        </h2>
+        <!-- Input para eliminar producto -->
+        <input 
+            id="deleteId" 
+            placeholder="ID"
+        >
+        <!-- Boton para eliminar producto -->
+        <button onclick="deleteProduct()">
+            Eliminar
+        </button>
+        <!-- Mensaje de eliminado -->
+        <p 
+            id="deleteMessage" 
+            style="color:red;"
+        ></p>
+
+        <script>
+            // Ruta para las peticiones
+            const api = "http://localhost:8080";
+
+            // Metodo para limpiar los campos del formulario
+            function cleanMessages() {
+                document.getElementById("successMessage").style.display = "none";
+                document.getElementById("successMessage").innerText     = "";
+                document.getElementById("updateMessage").innerText      = "";
+                document.getElementById("deleteMessage").innerText      = "";
+                document.getElementById("searchResult").innerText       = "";
+            }
+
+            // Metodo para crear materia
+            function createProduct() {
+                // Limpia los campos del formulario
+                cleanMessages();
+
+                // Setea los campos para la peticion
+                const data = {
+                    name     : document.getElementById("subjectName").value,
+                    price    : document.getElementById("subjectPrice").value,
+                    stock    : document.getElementById("subjectStock").value,
+                    category : document.getElementById("subjectCategory").value,
+                };
+
+                // Realiza fetch para la peticion para crear materia nueva
+                fetch(`${api}/products`, {
+                    method  : "POST",
+                    headers : { "Content-Type": "application/json" },
+                    body    : JSON.stringify(data)
+                })
+                    .then(res => res.json())
+                    .then(() => {
+                        document.getElementById("successMessage").style.display = "block";
+                        // Mensaje de exito
+                        document.getElementById("successMessage").innerText     = "Creado correctamente";
+
+                        // Limpia los campos del formulario
+                        document.getElementById("subjectId").value       = "";
+                        document.getElementById("subjectName").value     = "";
+                        document.getElementById("subjectPrice").value    = 0;
+                        document.getElementById("subjectStock").value    = 0;
+                        document.getElementById("subjectCategory").value = 0;
+                    });
+            }
+
+            // Metodo para recuperar todas las materias
+            function getProducts() {
+                // Limpia los campos del formulario
+                cleanMessages();
+
+                // Realiza fetch para la peticion para recuperar todas la materias
+                fetch(`${api}/products`)
+                    .then(res => res.json())
+                    .then(data => {
+                        // Crea una lista de materias
+                        const list = document.getElementById("productsList");
+                        list.innerHTML = "";
+                        console.log(data);
+
+                        // Muestra cada materia creada
+                        data.forEach(s => {
+                            const li       = document.createElement("li");
+                            li.textContent = `${s.id} - ${s.name} - ${s.price}`;
+                            list.appendChild(li);
+                        });
+                    });
+            }
+
+            // Metodo para recuperar materias por su id
+            function getProductById() {
+                // Limpia los campos del formulario
+                cleanMessages();
+
+                // Recupera el id
+                const id = document.getElementById("searchById").value;
+
+                // Realiza fetch para la peticion para recuperar una materia por su id
+                fetch(`${api}/products/${id}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        // Muestra el json de la materia
+                        document.getElementById("searchResult").innerText =
+                        JSON.stringify(data, null, 2);
+                    });
+            }
+
+            // Metodo para actualizar producto
+            function updateProduct() {
+                // Limpia los campos del formulario
+                cleanMessages();
+
+                // Recupera el id
+                const id = document.getElementById("updateId").value;
+
+                // Setea los datos
+                const data = {
+                    id    : id,
+                    name  : document.getElementById("updateName").value,
+                    price : document.getElementById("updatePrice").value,
+                };
+
+                // Realiza fetch para la peticion para actualizar materia existente
+                fetch(`${api}/products/${id}`, {
+                    method  : "PUT",
+                    headers : { "Content-Type": "application/json" },
+                    body    : JSON.stringify(data)
+                })
+                    .then(res => res.json())
+                    .then(() => {
+                        // Mensaje de exito
+                        document.getElementById("updateMessage").innerText = "Actualizado correctamente";
+
+                        // Limpia campos del formulario
+                        document.getElementById("updateId").value    = "";
+                        document.getElementById("updateName").value  = "";
+                        document.getElementById("updatePrice").value = 0;
+                    });
+            }
+
+            // Metodo para eliminar materia
+            function deleteSubject() {
+                // Limpia los campos del formulario
+                cleanMessages();
+
+                // Recupera el id
+                const id = document.getElementById("deleteId").value;
+
+                // Realiza fetch para la peticion para eliminar una materia por su id
+                fetch(`${api}/products/${id}`, {
+                    method: "DELETE"
+                })
+                    .then(() => {
+                        // Mensaje de exito
+                        document.getElementById("deleteMessage").innerText = "Eliminado correctamente";
+                        document.getElementById("deleteId").value          = "";
+                    });
+            }
+        </script>
+    </body>
+</html>

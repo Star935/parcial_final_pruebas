@@ -1,0 +1,40 @@
+name: CI parcial final pruebas
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configura el golang
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Instalando las dependencias del proyecto
+        run: go mod tidy
+
+      - name: Realizando analisis estatico del codigo
+        run: gosec ./...
+
+      - name: Realizando analisis de las depedencias del codigo
+        run: govulncheck ./...
+
+      - name: Ejecutando pruebas
+        run: |
+          echo 'Ejecutando pruebas...'
+          if go test ./...; then
+            echo 'Todas las pruebas pasaron exitosamente!'
+          else
+            echo 'Algunas pruebas fallaron!'
+            exit 1
+          fi
