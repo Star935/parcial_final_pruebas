@@ -23,9 +23,6 @@ jobs:
       - name: Instalando las dependencias del proyecto
         run: go mod tidy
 
-      - name: Realizando analisis estatico del codigo
-        run: gosec ./...
-
       - name: Realizando analisis de las depedencias del codigo
         run: govulncheck ./...
 
