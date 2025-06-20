@@ -27,6 +27,13 @@ El proyecto corre en localhost
 - PUT "/categories/:id" Actualiza una categoria por su id
 - DELETE "/categories/:id" Elimina una categoria por su id
 
+### Nota importante
+El comando del pipeline ejecuta todas las pruebas, incluida la de performance_test la cual falla, el siguiente es el fragmento de la informacion de la prueba
+FAIL	parcial_final/performance_test	5.005s
+
+La siguiente linea es el estado de las pruebas:
+ok  	parcial_final/tests	0.004s (es ok en el caso de que funcione)
+
 ### Comando para iniciar el servidor:
 ```bash
 go run main.go
