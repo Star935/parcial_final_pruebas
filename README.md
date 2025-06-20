@@ -29,10 +29,13 @@ El proyecto corre en localhost
 
 ### Nota importante
 El comando del pipeline ejecuta todas las pruebas, incluida la de performance_test la cual falla, el siguiente es el fragmento de la informacion de la prueba
+```bash
 FAIL	parcial_final/performance_test	5.005s
-
+```
 La siguiente linea es el estado de las pruebas:
+```bash
 ok  	parcial_final/tests	0.004s (es ok en el caso de que funcione)
+```
 
 ### Comando para iniciar el servidor:
 ```bash
